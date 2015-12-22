@@ -91,7 +91,17 @@ def main():
     print colors.yellow("Installation complete!")
 
 if __name__ == "__main__":
+    src_dir = os.path.abspath (os.path.realpath(__file__) + '/../../').rstrip('/')
+    dst_dir = config.BASE_DIR.rstrip('/')
+
+    if src_dir == dst_dir:
+        print 'Source and target directories are the same.'
+        print 'It looks like you are trying to reinstall Activae using an installer located in the target directory.'
+        print 'You must try from another location. Aborting deployment!'
+        sys.exit(-1)
+
     if os.getuid() == 0:
         main()
     else:
         print 'Must be root to run the installer'
+        sys.exit(-2)

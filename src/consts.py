@@ -229,3 +229,7 @@ LANG = [ # ISO 639-1
 ('zh','Chino'),
 ('zu','Zulú'),
 ]
+
+LEN_TITL = 256
+LEN_SUBJ = 45
+LEN_DESC = 8192

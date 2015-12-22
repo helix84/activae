@@ -222,12 +222,12 @@ def add_asset (parent_id = None):
     table = CTK.PropsTable ()
     table.Add ('Tipo',        ComboboxSQL  ({'name':'asset_types_id', 'class': "required"}, q_types), 'Tipo de activo')
     table.Add ('Licencia',    ComboboxSQL  ({'name':'licenses_id', 'class': "required", 'selected': DEFAULT_LICENSE}, q_licenses), 'Licencia del activo')
-    table.Add ('Título',      CTK.TextField({'name':'title',   'class': "required"}), 'Titulo del activo')
-    table.Add ('Descripción', CTK.TextField({'name':'description'}), 'Descripcion del activo')
+    table.Add ('Título',      CTK.TextField({'name':'title',  'class': "required", 'maxlength': LEN_TITL}), 'Titulo del activo')
+    table.Add ('Descripción', CTK.TextField({'name':'description', 'maxlength': LEN_DESC}), 'Descripcion del activo')
     table.Add ('Versión',     CTK.TextField({'name':'version'}), 'Version del activo')
     table.Add ('Partes',      PartChooser({'name':'parts'}), 'Otros activos que forman parte del actual')
     table.Add ('Idioma',      CTK.Combobox({'name':'language','class': "required"}, lang_options), 'Idioma del activo')
-    table.Add ('Tema',        CTK.TextField({'name':'subject', 'class': "required"}), 'El tema del contenido del recurso')
+    table.Add ('Tema',        CTK.TextField({'name':'subject', 'class': "required", 'maxlength': LEN_SUBJ}), 'El tema del contenido del recurso')
 
     form = CTK.Submitter("%s/new/apply"%LOCATION)
     form += table

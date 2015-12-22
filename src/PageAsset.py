@@ -271,11 +271,11 @@ def edit_asset ():
     table.AddConstant ('asset_id',str(asset_id))
     table.Add ('Tipo',        types, 'asset_types_id', 'Tipo de activo')
     table.Add ('Licencia',    licenses, 'licenses_id', 'Licencia del activo')
-    table.Add ('Título',      CTK.TextField({'class':'required'}), 'title', 'Titulo del activo')
-    table.Add ('Descripción', CTK.TextField({'class':'required'}), 'description', 'Descripcion del activo')
+    table.Add ('Título',      CTK.TextField({'class':'required', 'maxlength': LEN_TITL}), 'title', 'Titulo del activo')
+    table.Add ('Descripción', CTK.TextField({'class':'required', 'maxlength': LEN_DESC}), 'description', 'Descripcion del activo')
     table.Add ('Versión',     CTK.TextField({'class':'required'}), 'version', 'Version del activo')
     table.Add ('Idioma',      languages, 'language', 'Idioma del activo')
-    table.Add ('Tema',        CTK.TextField({'class':'required'}), 'subject', 'El tema del contenido del recurso')
+    table.Add ('Tema',        CTK.TextField({'class':'required', 'maxlength': LEN_SUBJ}), 'subject', 'El tema del contenido del recurso')
 
     form = CTK.Submitter('%s/edit/apply'%LOCATION)
     form += table

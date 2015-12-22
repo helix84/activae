@@ -17,7 +17,7 @@ LIBSPEEX_URL   = "http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz"
 LIBFLAC_URL    = "http://downloads.sourceforge.net/project/flac/flac-src/flac-1.2.1-src/flac-1.2.1.tar.gz"
 LIBGSM_URL     = "http://www.imagemagick.org/download/delegates/ffmpeg/gsm-1.0.12.tar.gz"
 LIBDC1394_URL  = "http://sourceforge.net/projects/libdc1394/files/libdc1394-2/2.1.2/libdc1394-2.1.2.tar.gz/download"
-FFMPEG_URL     = "svn://svn.ffmpeg.org/ffmpeg/trunk@23512"
+FFMPEG_URL     = "http://forja.cenatic.es/frs/download.php/1148/svn.ffmpeg.org_ffmpeg_trunk_23512.tar.gz" # "svn://svn.ffmpeg.org/ffmpeg/trunk@23512"
 
 def check_preconditions():
     assert os.access (config.BASE_DIR, os.W_OK), "Cannot deploy to: %s" %(config.BASE_DIR)
