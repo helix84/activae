@@ -64,6 +64,11 @@ THUMB_VIDEO_OFFSET = 4         # seconds
 THUMB_ASSET        = "%s/thumb_asset.png" % ICON_PATH      #default asset icon
 THUMB_COLLECTION   = "%s/thumb_collection.png" % ICON_PATH #default collection icon
 THUMB_EXT          = "png"
+THUMB_ABS_ASSET_AUDIO  = "%s/public/images/Tango/thumb_audio.png" % STATIC_PATH
+THUMB_ABS_ASSET_IMAGE  = "%s/public/images/Tango/thumb_image.png" % STATIC_PATH
+THUMB_ABS_ASSET_TEXT   = "%s/public/images/Tango/thumb_text.png"  % STATIC_PATH
+THUMB_ABS_ASSET_VIDEO  = "%s/public/images/Tango/thumb_video.png" % STATIC_PATH
+THUMB_ABS_ASSET        = "%s/public/images/Tango/thumb_asset.png" % STATIC_PATH
 
 # Abstracts
 #

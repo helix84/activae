@@ -37,7 +37,9 @@
 import os
 import re
 import sys
+import shutil
 sys.path.append("..")
+import Upload
 from config import *
 from VFS import *
 
@@ -63,6 +65,7 @@ VIDEO_OPTIONS = {'flv':  '-ar 44100',
                  'rawvideo':   '-f rawvideo',
                  }
 
+
 class VideoConverter:
     def __init__ (self):
         None
@@ -85,6 +88,22 @@ class VideoThumbnail:
         None
 
     def generate (self, input, target):
+        target_base, target_ext = os.path.splitext (target)
+        mtype = Upload.get_type(target_base)
+
+        if mtype not in ['audio', 'image', 'text', 'video']:
+            mtype = None
+
+        icons = {'audio': THUMB_ABS_ASSET_AUDIO,
+                 'image': THUMB_ABS_ASSET_IMAGE,
+                 'text':  THUMB_ABS_ASSET_TEXT,
+                 'video': THUMB_ABS_ASSET_VIDEO,
+                 None   : THUMB_ABS_ASSET,}
+
+        if mtype not in ['video','image']:
+            shutil.copyfile (icons[mtype], target)
+            return
+
         try:
             exe ("LD_LIBRARY_PATH=%s/lib %s/bin/ffmpeg -y -i '%s' -itsoffset -%d -vcodec mjpeg -vframes 1 -an -f rawvideo -s %s '%s'" % (
                     BASE_DIR, BASE_DIR, input, THUMB_VIDEO_OFFSET, THUMB_SIZE, target))

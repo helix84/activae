@@ -168,9 +168,12 @@ def is_image (filename):
 
 def determine_format_id (fullname):
    # Last resort: identify by mime and/or extension
-   mime, enc = mimetypes.guess_type(fullname)
-   ext       = mimetypes.guess_extension (mime)
-   format_id = get_format_id (ext[1:])
+   try:
+      mime, enc = mimetypes.guess_type(fullname)
+      ext       = mimetypes.guess_extension (mime)
+      format_id = get_format_id (ext[1:])
+   except:
+      format_id = None
 
    if not format_id:
       _, ext = os.path.splitext(fullname)

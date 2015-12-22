@@ -8,7 +8,7 @@ from utils import chdir, exe, which, exe_output
 LIBOGG_URL     = "http://downloads.xiph.org/releases/ogg/libogg-1.1.4.tar.gz"
 LIBVORBIS_URL  = "http://downloads.xiph.org/releases/vorbis/libvorbis-1.2.3.tar.gz"
 LIBTHEORA_URL  = "http://downloads.xiph.org/releases/theora/libtheora-1.1beta2.tar.bz2"
-LIBX264_URL    = "ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20100606-2245.tar.bz2"
+LIBX264_URL    = "http://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20100606-2245.tar.bz2"
 LIBXVID_URL    = "http://downloads.xvid.org/downloads/xvidcore-1.2.2.tar.bz2"
 LIBMP3LAME_URL = "http://sourceforge.net/projects/lame/files/lame/3.98.2/lame-398-2.tar.gz/download"
 LIBFAAD_URL    = "http://downloads.sourceforge.net/faac/faad2-2.7.tar.bz2"
