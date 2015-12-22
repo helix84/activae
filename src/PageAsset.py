@@ -45,6 +45,7 @@ import Validations
 import Page
 import Upload
 import WorkflowManager
+import File
 
 import WidgetLookup
 from ACL import ACL
@@ -187,6 +188,17 @@ def edit_asset_apply():
         asset['version'] += 1
     else:
         asset['version'] = post_version
+
+    # Duplicate the attached file
+    try:
+        attachment  = File.clone_file (asset._file)
+        asset._file = attachment
+    except IOError,e:
+        # If file copying is not possible, report and abort
+        msg  = 'File duplication could not be performed while editing asset ID %s.' %(asset_id)
+        msg += '\n%s\n' %(str(e))
+        print msg
+        return {'ret':"error"}
 
     # Add replacement info
     if not asset._parent_id:

@@ -34,9 +34,12 @@
 # de Servicios Sociales: C/ Vistahermosa, 1, 3ra planta, 06200
 # Almendralejo (Badajoz), Spain
 
+import os
+
 from DBSlayer import Query,transaction_check_success
 from config import *
 import Error
+import Upload
 
 def get_files_by_flag (flag):
     q = "SELECT * "\
@@ -117,6 +120,39 @@ def unset_flag (flag):
     q = "UPDATE files SET queue_flag=0 WHERE queue_flag=%s;" %(flag);
     query = Query(q)
 
+def clone_file (file_info):
+    """Duplicate a file on disk, returning a file_info dict or raising an IOError"""
+    assert type(file_info) in (dict, type(None))
+
+    if not file_info:
+        return None
+
+    # Basic info
+    new_file  = file_info.copy()
+    old_name  = new_file.get('filename')
+    full_name = os.path.join (ASSET_PATH, old_name)
+    thumbnail = os.path.join (THUMB_PATH, old_name) + '.%s'%(THUMB_EXT)
+
+    # Check file sizes
+    stat       = os.statvfs(ASSET_PATH)
+    free_space = stat.f_bavail * stat.f_bsize
+    file_size  = os.path.getsize (full_name)
+    if file_size > free_space:
+        raise IOError, "Not enough free space to duplicate file."
+
+    # Duplicate file & thumbnail on a subshell
+    all_files = os.listdir (ASSET_PATH)
+    new_name  = Upload.get_unused_name (full_name, all_files)
+    new_fullname = os.path.join (ASSET_PATH, new_name)
+    new_thumbnail= os.path.join (THUMB_PATH, new_name) + '.%s'%(THUMB_EXT)
+
+    os.system ("cp %s %s &" %(full_name, new_fullname))
+    os.system ("cp %s %s &" %(thumbnail, new_thumbnail))
+
+    # Return
+    file_info['filename'] = new_name
+    return file_info
+
 
 def test ():
     import sys
@@ -157,6 +193,12 @@ def test ():
     assert ret == True
     print 'Test asset restore:', ret
 
+    print type(old_file), old_file
+    ret = clone_file (old_file)
+    if ret:
+        print 'clone_file result: OK', ret
+    else:
+        print 'clone_file result: ERROR'
 
 if __name__ == '__main__':
     test()
