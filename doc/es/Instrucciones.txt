@@ -1,15 +1,10 @@
-Paquetes entregados
-===================
-activae.tar.gz		Activae			--> se debe colocar en /opt/activae (modificable en deployment/config.py)
-pruebas.tar.gz		Datos de prueba		--> se detalla más adelante
-activae_src.tar.gz	Caché del instalador	--> sus datos se deben ubicar en /opt
+Requisitos mínimos de ejecución
+===============================
 
-
-Entorno de prueba
-=================
-Máquina virtual con una instalación mínima de Ubuntu 10.04 32bits [1],
-1GB de RAM, 8GB de HDD. Esta máquina se usará para todos los
-servicios: Activae, cola de transcodificación y API de búsquedas.
+Máquina con una instalación mínima de Ubuntu 10.04 32bits [1],
+1GB de RAM, 8GB de HDD. En la instalación mínima (la abordada en este documento),
+esta máquina se usará para todos los servicios: Activae, cola de transcodificación
+y API de búsquedas.
 
 1: http://ubuntu.grn.cat/ubuntu-releases/lucid/ubuntu-10.04-server-i386.iso
 
@@ -18,9 +13,18 @@ necesarios para construir el sistema.
 
 # apt-get install gcc g++ subversion patch wget libxml2-dev mysql-server rrdtool libmysqlclient-dev libjpeg62-dev zlib1g-dev autoconf unzip python-pycurl pkg-config gettext
 
+NOTA IMPORTANTE: Activae es extremadamente flexible y escalable. Su ejecución es óptima cuando todos 
+                 los servicios que despliega corren en diversas máquinas, en condiciones de alta
+                 disponibilidad y balanceo de carga. En este documento se especifica de forma somera
+                 y sencilla la instalación, configuración y ejecución de la plataforma en un solo
+                 servidor. Para configuraciones más complejas, dirigirse al manual del administrador
+                 en la carpeta /doc.
 
-Listado de puertos
-==================
+
+Listado de puertos: explicación
+===============================
+
+Activae despliega servicios en diversos puertos. Se especifican a continuación:
 
 Puerto	Descripción
 ------------------------------------------------------------------------
@@ -50,8 +54,9 @@ balanceadores pertinentes mediante la edición de los ficheros:
   dabase/cherokee.conf
 
 
-Arquitectura
-============
+Arquitectura una vez desplegada la plataforma
+=============================================
+
                   -->  Back-end 1  -----
                  |     [Port 9091]      |
                  |                      |                    -> MySQL 1
@@ -71,51 +76,64 @@ Queue-balancer --|-->  Transcode-engine 2
                   -->  Transcode-engine 3
                        [Port 8003]
 
-Dependencias
-============
-Requisitos: crear usuario y grupo 'activae'
-En nuestro ejemplo, instalamos todo en opt/activae (ya sea
+Instalación básica
+==================
+
+1) crear usuario y grupo 'activae'
+
+# useradd activae
+
+2) Descomprimir o descargar los fuentes.
+
+En nuestro ejemplo, instalamos todo en opt/activae-inst (ya sea
 descomprimiendo el paquete o copiando ahí los archivos de la forja:
 
-# svn checkout https://svn.forge.morfeo-project.org/activae/dam activae
+# cd /opt
+# svn checkout https://svn.forge.morfeo-project.org/activae/dam-stable-branch activae-inst
 
-Así, en /opt/activae estarán almacenados todos los archivos necesarios
+si se descarga directamente el código de la forja, o bien
+
+# cd /opt
+# tar xzfv /ruta/que/sea/activae.tar.gz
+
+si se realiza descomprimiendo los fuentes de un paquete que se ha descargado previamente.
+
+Así, en /opt/activae-inst estarán almacenados todos los archivos necesarios
 para realizar la instalación.
 
+3) Reconfigurar rutas (no recomendable).
+
 Se pueden reconfigurar las rutas de instalacción en
-/opt/activae/deployment/config.py
+/opt/activae-inst/deployment/config.py
 
 Opcionalmente se pueden personalizar el resto de rutas en
-/opt/activae/src/config.py, pero esto no es necesario.
+/opt/activae-inst/src/config.py, pero esto no es necesario.
 
 El instalador automáticamente detecta y descarga las dependencias que
-no estén en su paquete. En el paquete proporcionado activae_src.tar.gz
-están todas, por lo que no debería necesitar descagar paquetes.
-
-Tras ejecutar el instalador y descargar dependencias, estas se quedan
-cacheadas para futuras instalaciones.
+no estén en su paquete. 
 
 El instalador utiliza por defecto las rutas especificadas en
-activae/deployment/config.py, por lo que si se desea especificar el
+activae-inst/deployment/config.py, por lo que si se desea especificar el
 destino de los archivos bastará con editar dicho fichero. Por defecto
 las descargas se realizarán en /opt/activae_src, y la instalación se
 hará en /opt/activae.
 
+4) Comenzar la instalación
+
 Para lanzar el instalador, bastará con ejecutar lo siguiente:
 
-# cd /opt/activae/deployment
-# make install
+# cd /opt/activae-inst/deployment
+# sudo make install
 
 El propio instalador pedirá que se creen los directorios y ficheros
-necesarios con los permisos adecuados.
+necesarios con los permisos adecuados en caso necesario.
 
 Base de datos
 =============
 La creación de la base de datos y asignación de permisos se haría de
-la siguiente manera (se asume que se dispone de un usuario y
-contraseña con privilegios para crear bases de datos MySQL):
+la siguiente manera:
 
-# mysql
+# mysql -uroot -hlocalhost -p
 [...]
 mysql>	CREATE DATABASE activae;
 	GRANT ALL PRIVILEGES ON activae.* TO activae@localhost IDENTIFIED BY 'activae';
@@ -123,82 +141,59 @@ mysql>	CREATE DATABASE activae;
 	FLUSH PRIVILEGES;
 	quit;
 
-# mysql activae < activae.sql
+# cd /opt/activae-inst/database
+# mysql -uroot -hlocalhost -p activae < activae.sql
 
-Se proporcionan dos bases de datos:
-activae.sql --> Base de datos mínima.
-                Tiene USUARIO: 'admin', CONTRASEÑA: 'admin'
+Ambos comandos solicitarán la clave del usuario root del servidor MySQL. Diríjase al manual de MySQL para más información.
 
-sql.sql     --> Base de datos de prueba. Se habla de ella más adelante.
-                Tiene más usuarios creados: admin, consumer, creator, editor,
-                publisher
-                Todos ellos tienen la siguiente contraseña: password
+Con esto la instalación de la plataforma habrá finalizado. 
 
-Datos de prueba
-===============
-La base de datos sql.sql está poblada con los datos correspondientes a
-cientos de archivos entre imágenes y videos.
+Configuración del arranque automático
+=====================================
 
-Los archivos de medios se guardan por defecto en
-src/static/private/assets/ así que si se usa sql.sql hay que meter ahí
-los videos e imágenes descargados al hacer:
+Primero copiamos los scripts de inicio que acompañana a la plataforma, al lugar 
+adecuado:
 
-cd activae/qa/ ; make
+# sudo cp /opt/activae/init.d/* /etc/init.d
 
-La descarga se realiza en el directorio de la caché del instalador
-(/opt/activae_src), bajo ./video y ./images, y ocupa aproximadamente
-3.5GB
+Y luego configuramos los scripts para cada nivel de ejecución. Usamos los
+valores por defecto
 
-También se proporcionan los thumbnails correspondientes (a ser
-alojados bajo src/static/private/thumbs/ (que se habrían creado si se
-hubiesen insertado los datos a través de la aplicación en lugar de
-mediante un volcado directo).  El fichero que se proporciona ya lleva
-la jerarquía de directorios definida, así que basta con copiarlo sobre
-el directorio de 'activae' para que se situén adecuadamanete.
+# sudo update-rc.d activae defaults
+
+Ejecución de la plataforma
+==========================
+
+Teniendo en cuenta que, como se especificó al principio de este documento
+estamos hablando de una instalación básica en un solo servidor, para
+correr la aplicación simplemente habrá que hacer:
+
+$ sudo /etc/init.d/activae start
+
+Y esto levantará los servicios de Activae de forma automática:
+
+- Balanceador web.
+- Balanceador de base de datos.
+- Transcodificadores.
+- Exportación de la API.
+
+Y, además, el sistema estará preparado para volver a levantar estos
+servicios automáticamente ante eventuales reinicios del sistema operativo.
+
+NOTA: Activae levanta su propio servidor web en el puerto 80. Esto significa 
+      que si ya hay otro servidor web usando ese puerto (por ejemplo Apache),
+      el inicio de la aplicación dará fallo.
+
+Acceso a Activae
+================
+
+http://localhost
+
+Usuario por defecto: admin
+Clave por defecto..: admin
 
 
-Componentes de la aplicación
-============================
-Para lanzar la plataforma es preciso que todos los componentes
-deseados estén operativos. Además, debe existir un usuario 'activae' y
-grupo 'activae' para correr los servicio.
 
-Estos componentes serán, como mínimo, el frontend o balanceador
-principal de la aplicación y el balanceador de la base de datos. Se
-lanzan respectivamente con:
 
-$ sudo ./activae.py --frontend
-$ ./activae.py --database
-
-Nota: Es necesario lanzar el frontend con un usuario que tenga acceso
-al puerto 80, aunque posteriormente la instancia balanceadora de
-Cherokee hará el cambio efectivo al usuario 'activae' para que no sea
-necesario correr un servicio web como superusuario.
-
-Nótese que si no se configura dicho usuario, entonces sí que se
-ejecutarán los servidores web como usuario privilegiado, lo cual es un
-riesgo de seguridad. A este respecto cabe destacar que si se ejecutan
-los demás servicios como usuario privilegiado, los posibles ficheros y
-directorios que se creen pertenecerán a dicho usuario. Esto implica
-que una ejecución posterior sin privilegios podría tener problemas de
-acceso a dichos ficheros por permisos insuficientes. Si esto sucede,
-se notifica por consola. Además, las instancias web lanzadas por el
-frontend siempre son ejecutadas por el usuario 'activae'. Esto es así
-por diseño.
-
-Para que Activae sea funcional, también es necesario lanzar la cola de
-transcodificación (o de lo contrario no será posible encolar
-peticiones para crear versiones en otros formatos de los activos).
-
-$ ./activae.py --queue
-
-(Por defecto, la cola lanza un trabajador en 127.0.0.1, pero se pueden
-añadir tantos como se quiera en cualquier otra máquina y será
-documentado en detalle).
-
-Por último, en caso de querer que alguna de las máquinas exporte la
-API de búsquedas por XMLRPC, se deberá hacer así:
-
-$ ./activae.py --search
 
 
